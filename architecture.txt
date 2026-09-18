@@ -1,0 +1,22 @@
+What files do we need for this project?
+- main.py
+- parsing.py
+    - in: file
+    - out: data for algo
+- algo.py
+    - in: nodes + drones + connections
+    - calculates most optimal path for number of drones
+    - out: list of paths
+
+class data:
+- number of drones
+- drone
+- node
+    - spawn
+    - classic
+        - capacity
+    - end
+- connection
+   - node 1
+   - node 2
+   - capacity
