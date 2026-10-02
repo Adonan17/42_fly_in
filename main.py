@@ -1,16 +1,26 @@
-# This is a sample Python script.
+import sys
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+from parsing import Parsing
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def main() -> None:
+    if len(sys.argv) != 2:
+        print("Usage: python3 main.py <map_file>")
+        sys.exit(1)
+    parsing = Parsing()
+    try:
+        parsing.read_file(sys.argv[1])
+    except (OSError, ValueError) as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    print("nb_drones:", parsing.nb_drones)
+    for hub in parsing.hubs:
+        print(hub.name, hub.x, hub.y, hub.zone, hub.color, hub.max_drones)
+    for connection in parsing.connections:
+        print(connection.name1, connection.name2,
+              connection.max_link_capacity)
+
+
+if __name__ == "__main__":
+    main()
