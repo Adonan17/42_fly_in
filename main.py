@@ -1,6 +1,7 @@
 import sys
 
 from parsing import Parsing
+from algo import Algo
 
 
 def main() -> None:
@@ -14,12 +15,7 @@ def main() -> None:
         print(f"Error: {e}")
         sys.exit(1)
 
-    print("nb_drones:", parsing.nb_drones)
-    for hub in parsing.hubs:
-        print(hub.name, hub.x, hub.y, hub.zone, hub.color, hub.max_drones)
-    for connection in parsing.connections:
-        print(connection.name1, connection.name2,
-              connection.max_link_capacity)
+    print(Algo(parsing).shortest_path())
 
 
 if __name__ == "__main__":
