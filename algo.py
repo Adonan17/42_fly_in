@@ -58,6 +58,12 @@ class Algo:
             path.insert(0, prev[path[0]])
         return path
 
+    def link_capacity(self, name1: str, name2: str) -> int:
+        for connection in self.parsing.connections:
+            if {connection.name1, connection.name2} == {name1, name2}:
+                return connection.max_link_capacity
+        raise ValueError(f"unknown connection '{name1}-{name2}'")
+
     def count_at(self, index: int, positions: list[int],
                  flying: list[bool]) -> int:
         count = 0
@@ -75,21 +81,27 @@ class Algo:
         last = len(path) - 1
         while positions.count(last) < nb:
             moves = []
+            used_links: list[str] = []
             for i in range(nb):
                 if positions[i] == last:
                     continue
                 next_hub = self.get_hub(path[positions[i] + 1])
+                link = path[positions[i]] + "-" + next_hub.name
+                link_full = (used_links.count(link) >= self.link_capacity(
+                    path[positions[i]], next_hub.name))
                 if flying[i]:
                     # must land this turn
                     flying[i] = False
+                    used_links.append(link)
                     positions[i] += 1
                     moves.append(f"D{i + 1}-{next_hub.name}")
-                elif (self.count_at(positions[i] + 1, positions, flying)
-                        < next_hub.max_drones):
+                elif (not link_full
+                      and self.count_at(positions[i] + 1, positions, flying)
+                      < next_hub.max_drones):
+                    used_links.append(link)
                     if next_hub.zone == "restricted":
                         flying[i] = True
-                        connection = path[positions[i]] + "-" + next_hub.name
-                        moves.append(f"D{i + 1}-{connection}")
+                        moves.append(f"D{i + 1}-{link}")
                     else:
                         positions[i] += 1
                         moves.append(f"D{i + 1}-{next_hub.name}")
