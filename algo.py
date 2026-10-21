@@ -58,9 +58,20 @@ class Algo:
             path.insert(0, prev[path[0]])
         return path
 
+    def count_at(self, index: int, positions: list[int],
+                 flying: list[bool]) -> int:
+        count = 0
+        for i in range(len(positions)):
+            if positions[i] == index and not flying[i]:
+                count += 1
+            elif positions[i] == index - 1 and flying[i]:
+                count += 1
+        return count
+
     def simulate(self, path: list[str]) -> None:
         nb = self.parsing.nb_drones
         positions = [0] * nb
+        flying = [False] * nb
         last = len(path) - 1
         while positions.count(last) < nb:
             moves = []
@@ -68,7 +79,18 @@ class Algo:
                 if positions[i] == last:
                     continue
                 next_hub = self.get_hub(path[positions[i] + 1])
-                if positions.count(positions[i] + 1) < next_hub.max_drones:
+                if flying[i]:
+                    # must land this turn
+                    flying[i] = False
                     positions[i] += 1
                     moves.append(f"D{i + 1}-{next_hub.name}")
+                elif (self.count_at(positions[i] + 1, positions, flying)
+                        < next_hub.max_drones):
+                    if next_hub.zone == "restricted":
+                        flying[i] = True
+                        connection = path[positions[i]] + "-" + next_hub.name
+                        moves.append(f"D{i + 1}-{connection}")
+                    else:
+                        positions[i] += 1
+                        moves.append(f"D{i + 1}-{next_hub.name}")
             print(" ".join(moves))
