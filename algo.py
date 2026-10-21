@@ -57,3 +57,18 @@ class Algo:
         while path[0] != start:
             path.insert(0, prev[path[0]])
         return path
+
+    def simulate(self, path: list[str]) -> None:
+        nb = self.parsing.nb_drones
+        positions = [0] * nb
+        last = len(path) - 1
+        while positions.count(last) < nb:
+            moves = []
+            for i in range(nb):
+                if positions[i] == last:
+                    continue
+                next_hub = self.get_hub(path[positions[i] + 1])
+                if positions.count(positions[i] + 1) < next_hub.max_drones:
+                    positions[i] += 1
+                    moves.append(f"D{i + 1}-{next_hub.name}")
+            print(" ".join(moves))

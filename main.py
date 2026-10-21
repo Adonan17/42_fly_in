@@ -15,7 +15,8 @@ def main() -> None:
         print(f"Error: {e}")
         sys.exit(1)
 
-    print(Algo(parsing).shortest_path())
+    algo = Algo(parsing)
+    algo.simulate(algo.shortest_path())
 
 
 if __name__ == "__main__":
