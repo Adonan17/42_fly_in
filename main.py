@@ -16,7 +16,8 @@ def main() -> None:
         sys.exit(1)
 
     algo = Algo(parsing)
-    algo.simulate(algo.shortest_path())
+    for path in algo.find_paths():
+        print(path)
 
 
 if __name__ == "__main__":

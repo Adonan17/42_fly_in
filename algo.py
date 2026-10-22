@@ -25,7 +25,7 @@ class Algo:
             return 2
         return 1
 
-    def shortest_path(self) -> list[str]:
+    def shortest_path(self, avoid: list[str]) -> list[str]:
         if self.parsing.start_hub is None or self.parsing.end_hub is None:
             raise ValueError("missing start_hub or end_hub")
         start = self.parsing.start_hub.name
@@ -45,18 +45,33 @@ class Algo:
                 break
             done.append(current)
             for next_name in self.neighbors(current):
-                if self.get_hub(next_name).zone == "blocked":
+                if (self.get_hub(next_name).zone == "blocked"
+                        or next_name in avoid):
                     continue
                 new_dist = dist[current] + self.cost(next_name)
                 if next_name not in dist or new_dist < dist[next_name]:
                     dist[next_name] = new_dist
                     prev[next_name] = current
+        if end not in dist:
+            return []
 
         # walk back from end to start
         path = [end]
         while path[0] != start:
             path.insert(0, prev[path[0]])
         return path
+
+    def find_paths(self) -> list[list[str]]:
+        paths = []
+        avoid: list[str] = []
+        while True:
+            path = self.shortest_path(avoid)
+            if path == [] or path in paths:
+                break
+            paths.append(path)
+            # next paths can't reuse the hubs in the middle of this one
+            avoid += path[1:-1]
+        return paths
 
     def link_capacity(self, name1: str, name2: str) -> int:
         for connection in self.parsing.connections:
