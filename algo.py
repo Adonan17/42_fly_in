@@ -79,26 +79,46 @@ class Algo:
                 return connection.max_link_capacity
         raise ValueError(f"unknown connection '{name1}-{name2}'")
 
-    def count_at(self, index: int, positions: list[int],
-                 flying: list[bool]) -> int:
+    def path_turns(self, path: list[str]) -> int:
+        turns = 0
+        for name in path[1:]:
+            turns += self.cost(name)
+        return turns
+
+    def assign_paths(self, paths: list[list[str]]) -> list[list[str]]:
+        drone_paths: list[list[str]] = []
+        for _ in range(self.parsing.nb_drones):
+            # pick the path where this drone would arrive the soonest
+            best = paths[0]
+            for path in paths:
+                if (self.path_turns(path) + drone_paths.count(path)
+                        < self.path_turns(best) + drone_paths.count(best)):
+                    best = path
+            drone_paths.append(best)
+        return drone_paths
+
+    def count_at(self, name: str, drone_paths: list[list[str]],
+                 positions: list[int], flying: list[bool]) -> int:
         count = 0
         for i in range(len(positions)):
-            if positions[i] == index and not flying[i]:
+            path = drone_paths[i]
+            if not flying[i] and path[positions[i]] == name:
                 count += 1
-            elif positions[i] == index - 1 and flying[i]:
+            elif flying[i] and path[positions[i] + 1] == name:
                 count += 1
         return count
 
-    def simulate(self, path: list[str]) -> None:
+    def simulate(self, drone_paths: list[list[str]]) -> None:
         nb = self.parsing.nb_drones
         positions = [0] * nb
         flying = [False] * nb
-        last = len(path) - 1
-        while positions.count(last) < nb:
+        delivered = 0
+        while delivered < nb:
             moves = []
             used_links: list[str] = []
             for i in range(nb):
-                if positions[i] == last:
+                path = drone_paths[i]
+                if positions[i] == len(path) - 1:
                     continue
                 next_hub = self.get_hub(path[positions[i] + 1])
                 link = path[positions[i]] + "-" + next_hub.name
@@ -111,7 +131,8 @@ class Algo:
                     positions[i] += 1
                     moves.append(f"D{i + 1}-{next_hub.name}")
                 elif (not link_full
-                      and self.count_at(positions[i] + 1, positions, flying)
+                      and self.count_at(next_hub.name, drone_paths,
+                                        positions, flying)
                       < next_hub.max_drones):
                     used_links.append(link)
                     if next_hub.zone == "restricted":
@@ -120,4 +141,6 @@ class Algo:
                     else:
                         positions[i] += 1
                         moves.append(f"D{i + 1}-{next_hub.name}")
+                if positions[i] == len(path) - 1:
+                    delivered += 1
             print(" ".join(moves))
