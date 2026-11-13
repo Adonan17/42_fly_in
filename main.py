@@ -11,6 +11,9 @@ def main() -> None:
     parsing = Parsing()
     try:
         parsing.read_file(sys.argv[1])
+        algo = Algo(parsing)
+        paths = algo.find_paths()
+        algo.simulate(algo.assign_paths(paths))
     except (OSError, ValueError) as e:
         print(f"Error: {e}")
         sys.exit(1)

@@ -150,4 +150,6 @@ class Algo:
                         moves.append(f"D{i + 1}-{next_hub.name}")
                 if positions[i] == len(path) - 1:
                     delivered += 1
+            if moves == []:
+                raise ValueError("deadlock: no drone can move")
             print(" ".join(moves))
