@@ -10,6 +10,7 @@ class Algo:
         "maroon": "38;5;52", "crimson": "38;5;161", "lime": "38;5;118",
         "violet": "38;5;177",
     }
+
     def __init__(self, parsing: Parsing) -> None:
         self.parsing = parsing
 
@@ -149,7 +150,8 @@ class Algo:
                     flying[i] = False
                     used_links.append(link)
                     positions[i] += 1
-                    moves.append(f"D{i + 1}-{next_hub.name}")
+                    moves.append(self.colored(
+                        f"D{i + 1}-{next_hub.name}", next_hub.color))
                 elif (not link_full
                       and self.count_at(next_hub.name, drone_paths,
                                         positions, flying)
