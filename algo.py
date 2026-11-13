@@ -2,8 +2,21 @@ from parsing import Parsing, Hub
 
 
 class Algo:
+    COLORS = {
+        "black": "30", "red": "31", "green": "32", "yellow": "33",
+        "blue": "34", "magenta": "35", "cyan": "36", "white": "37",
+        "gray": "90", "orange": "38;5;208", "purple": "38;5;129",
+        "darkred": "38;5;88", "gold": "38;5;220", "brown": "38;5;94",
+        "maroon": "38;5;52", "crimson": "38;5;161", "lime": "38;5;118",
+        "violet": "38;5;177",
+    }
     def __init__(self, parsing: Parsing) -> None:
         self.parsing = parsing
+
+    def colored(self, text: str, color: str) -> str:
+        if color not in self.COLORS:
+            return text
+        return f"\033[{self.COLORS[color]}m{text}\033[0m"
 
     def get_hub(self, name: str) -> Hub:
         for hub in self.parsing.hubs:
@@ -144,10 +157,12 @@ class Algo:
                     used_links.append(link)
                     if next_hub.zone == "restricted":
                         flying[i] = True
-                        moves.append(f"D{i + 1}-{link}")
+                        moves.append(self.colored(
+                            f"D{i + 1}-{link}", next_hub.color))
                     else:
                         positions[i] += 1
-                        moves.append(f"D{i + 1}-{next_hub.name}")
+                        moves.append(self.colored(
+                            f"D{i + 1}-{next_hub.name}", next_hub.color))
                 if positions[i] == len(path) - 1:
                     delivered += 1
             if moves == []:
