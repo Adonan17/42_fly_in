@@ -31,6 +31,7 @@ class Algo:
         start = self.parsing.start_hub.name
         end = self.parsing.end_hub.name
         dist = {start: 0}
+        prio = {start: 0}
         prev: dict[str, str] = {}
         done: list[str] = []
 
@@ -49,8 +50,14 @@ class Algo:
                         or next_name in avoid):
                     continue
                 new_dist = dist[current] + self.cost(next_name)
-                if next_name not in dist or new_dist < dist[next_name]:
+                new_prio = prio[current]
+                if self.get_hub(next_name).zone == "priority":
+                    new_prio += 1
+                if (next_name not in dist or new_dist < dist[next_name]
+                        or (new_dist == dist[next_name]
+                            and new_prio > prio[next_name])):
                     dist[next_name] = new_dist
+                    prio[next_name] = new_prio
                     prev[next_name] = current
         if end not in dist:
             return []
