@@ -16,19 +16,20 @@ class Connection:
 
 
 class Parsing:
-    nb_drones: int
-    start_hub: Hub | None
-    end_hub: Hub | None
-    hubs: list[Hub]
-    connections: list[Connection]
+    def __init__(self) -> None:
+        self.nb_drones = 0
+        self.start_hub: Hub | None = None
+        self.end_hub: Hub | None = None
+        self.hubs: list[Hub] = []
+        self.connections: list[Connection] = []
+
+    def to_int(self, text: str, what: str) -> int:
+        try:
+            return int(text)
+        except ValueError:
+            raise ValueError(f"{what} must be an integer: '{text.strip()}'")
 
     def read_file(self, path: str) -> None:
-        self.nb_drones = 0
-        self.start_hub = None
-        self.end_hub = None
-        self.hubs = []
-        self.connections = []
-
         with open(path, "r") as file:
             lines = file.readlines()
 
@@ -60,7 +61,7 @@ class Parsing:
         self.check_data()
 
     def parse_nb_drones(self, text: str) -> None:
-        self.nb_drones = int(text)
+        self.nb_drones = self.to_int(text, "nb_drones")
         if self.nb_drones <= 0:
             raise ValueError("nb_drones must be positive")
 
@@ -84,8 +85,8 @@ class Parsing:
             raise ValueError("expected '<name> <x> <y> [metadata]'")
         hub = Hub()
         hub.name = parts[0]
-        hub.x = int(parts[1])
-        hub.y = int(parts[2])
+        hub.x = self.to_int(parts[1], "x")
+        hub.y = self.to_int(parts[2], "y")
 
         if "-" in hub.name:
             raise ValueError(f"'{hub.name}': no '-' allowed in names")
@@ -105,7 +106,7 @@ class Parsing:
             elif key == "color":
                 hub.color = value
             elif key == "max_drones":
-                hub.max_drones = int(value)
+                hub.max_drones = self.to_int(value, "max_drones")
                 if hub.max_drones <= 0:
                     raise ValueError("max_drones must be positive")
             else:
@@ -153,7 +154,8 @@ class Parsing:
         for item in metadata.split():
             key, _, value = item.partition("=")
             if key == "max_link_capacity" and value != "":
-                connection.max_link_capacity = int(value)
+                connection.max_link_capacity = self.to_int(
+                    value, "max_link_capacity")
                 if connection.max_link_capacity <= 0:
                     raise ValueError("max_link_capacity must be positive")
             else:
