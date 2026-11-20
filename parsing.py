@@ -1,4 +1,6 @@
 class Hub:
+    """A zone where the drones can fly through.
+    The attributes depend on the subject."""
     name: str
     x: int
     y: int
@@ -10,6 +12,7 @@ class Hub:
 
 
 class Connection:
+    """Link between 2 hubs."""
     name1: str
     name2: str
     max_link_capacity: int = 1
@@ -24,12 +27,14 @@ class Parsing:
         self.connections: list[Connection] = []
 
     def to_int(self, text: str, what: str) -> int:
+        """Raises the ValueError itself."""
         try:
             return int(text)
         except ValueError:
             raise ValueError(f"{what} must be an integer: '{text.strip()}'")
 
     def read_file(self, path: str) -> None:
+        """Reads the file line by line and gets the data out of the right lines."""
         with open(path, "r") as file:
             lines = file.readlines()
 
@@ -61,11 +66,13 @@ class Parsing:
         self.check_data()
 
     def parse_nb_drones(self, text: str) -> None:
+        """Raises error if number of drones is negative."""
         self.nb_drones = self.to_int(text, "nb_drones")
         if self.nb_drones <= 0:
             raise ValueError("nb_drones must be positive")
 
     def parse_start_hub(self, text: str) -> None:
+        """Adds start attribute to the start_hub."""
         if self.start_hub is not None:
             raise ValueError("there is already a start_hub")
         hub = self.parse_hub(text)
@@ -73,6 +80,7 @@ class Parsing:
         self.start_hub = hub
 
     def parse_hub(self, text: str) -> Hub:
+        """Returns the parsed hub with all the attributes."""
         metadata = ""
         if "[" in text:
             text, metadata = text.split("[", 1)
@@ -116,6 +124,7 @@ class Parsing:
         return hub
 
     def parse_end_hub(self, text: str) -> None:
+        """Adds end attribute to the end_hub."""
         if self.end_hub is not None:
             raise ValueError("there is already an end_hub")
         hub = self.parse_hub(text)
@@ -123,6 +132,7 @@ class Parsing:
         self.end_hub = hub
 
     def parse_connection(self, text: str) -> None:
+        """Adds attributes to the connexions."""
         metadata = ""
         if "[" in text:
             text, metadata = text.split("[", 1)
@@ -164,6 +174,7 @@ class Parsing:
         self.connections.append(connection)
 
     def check_data(self) -> None:
+        """Checks whether all the parsed information is usable for the simulation."""
         if self.nb_drones == 0:
             raise ValueError("missing nb_drones")
         if self.start_hub is None:

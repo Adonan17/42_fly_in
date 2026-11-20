@@ -15,17 +15,20 @@ class Algo:
         self.parsing = parsing
 
     def colored(self, text: str, color: str) -> str:
+        """Returns the text in the right color."""
         if color not in self.COLORS:
             return text
         return f"\033[{self.COLORS[color]}m{text}\033[0m"
 
     def get_hub(self, name: str) -> Hub:
+        """Returns the right hub or raises ValueError."""
         for hub in self.parsing.hubs:
             if hub.name == name:
                 return hub
         raise ValueError(f"unknown hub '{name}'")
 
     def neighbors(self, name: str) -> list[str]:
+        """Returns a list with the neighbors of the hub's names."""
         result = []
         for connection in self.parsing.connections:
             if connection.name1 == name:
@@ -35,11 +38,13 @@ class Algo:
         return result
 
     def cost(self, name: str) -> int:
+        """Returns the cost of the hub."""
         if self.get_hub(name).zone == "restricted":
             return 2
         return 1
 
     def shortest_path(self, avoid: list[str]) -> list[str]:
+        """Returns the shortest path from the start_hub to the end_hub."""
         if self.parsing.start_hub is None or self.parsing.end_hub is None:
             raise ValueError("missing start_hub or end_hub")
         start = self.parsing.start_hub.name
@@ -83,6 +88,7 @@ class Algo:
         return path
 
     def find_paths(self) -> list[list[str]]:
+        """Finds all the paths."""
         paths = []
         avoid: list[str] = []
         while True:
@@ -95,18 +101,21 @@ class Algo:
         return paths
 
     def link_capacity(self, name1: str, name2: str) -> int:
+        """Returns the max link capacity of a connexion or raises ValueError."""
         for connection in self.parsing.connections:
             if {connection.name1, connection.name2} == {name1, name2}:
                 return connection.max_link_capacity
         raise ValueError(f"unknown connection '{name1}-{name2}'")
 
     def path_turns(self, path: list[str]) -> int:
+        """Returns the turns and added cost."""
         turns = 0
         for name in path[1:]:
             turns += self.cost(name)
         return turns
 
     def assign_paths(self, paths: list[list[str]]) -> list[list[str]]:
+        """Returns the paths that the drones can take."""
         drone_paths: list[list[str]] = []
         for _ in range(self.parsing.nb_drones):
             # pick the path where this drone would arrive the soonest
@@ -120,6 +129,7 @@ class Algo:
 
     def count_at(self, name: str, drone_paths: list[list[str]],
                  positions: list[int], flying: list[bool]) -> int:
+        """Returns the number of drones on the hub."""
         count = 0
         for i in range(len(positions)):
             path = drone_paths[i]
@@ -130,6 +140,7 @@ class Algo:
         return count
 
     def simulate(self, drone_paths: list[list[str]]) -> None:
+        """Does the simulation and prints every move."""
         nb = self.parsing.nb_drones
         positions = [0] * nb
         flying = [False] * nb

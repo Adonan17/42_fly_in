@@ -5,6 +5,11 @@ from algo import Algo
 
 
 def main() -> None:
+    """Read the map given as argument and run the drone simulation.
+
+    Prints an error and exits with code 1 if the arguments or
+    the map are invalid.
+    """
     if len(sys.argv) != 2:
         print("Usage: python3 main.py <map_file>")
         sys.exit(1)
