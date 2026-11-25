@@ -19,7 +19,10 @@ class Connection:
 
 
 class Parsing:
+    """Read a map file and store its hubs and connections."""
+
     def __init__(self) -> None:
+        """Start with an empty map."""
         self.nb_drones = 0
         self.start_hub: Hub | None = None
         self.end_hub: Hub | None = None
@@ -27,14 +30,16 @@ class Parsing:
         self.connections: list[Connection] = []
 
     def to_int(self, text: str, what: str) -> int:
-        """Raises the ValueError itself."""
+        """Convert text to an int,
+         with a clear error if it isn’t one."""
         try:
             return int(text)
         except ValueError:
             raise ValueError(f"{what} must be an integer: '{text.strip()}'")
 
     def read_file(self, path: str) -> None:
-        """Reads the file line by line and gets the data out of the right lines."""
+        """Reads the file line by line
+         and gets the data out of the right lines."""
         with open(path, "r") as file:
             lines = file.readlines()
 
@@ -66,7 +71,7 @@ class Parsing:
         self.check_data()
 
     def parse_nb_drones(self, text: str) -> None:
-        """Raises error if number of drones is negative."""
+        """Read the number of drones; it must be positive."""
         self.nb_drones = self.to_int(text, "nb_drones")
         if self.nb_drones <= 0:
             raise ValueError("nb_drones must be positive")
@@ -132,7 +137,7 @@ class Parsing:
         self.end_hub = hub
 
     def parse_connection(self, text: str) -> None:
-        """Adds attributes to the connexions."""
+        """Read a connection line, check it, and store it."""
         metadata = ""
         if "[" in text:
             text, metadata = text.split("[", 1)
@@ -174,7 +179,8 @@ class Parsing:
         self.connections.append(connection)
 
     def check_data(self) -> None:
-        """Checks whether all the parsed information is usable for the simulation."""
+        """Checks whether all the parsed information
+         is usable for the simulation."""
         if self.nb_drones == 0:
             raise ValueError("missing nb_drones")
         if self.start_hub is None:
