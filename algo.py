@@ -14,7 +14,7 @@ class Algo:
 
     def __init__(self, parsing: Parsing) -> None:
         """Keep the parsed map to work on."""
-        self.parsing = parsing          # ← this line is missing
+        self.parsing = parsing
 
     def colored(self, text: str, color: str) -> str:
         """Returns the text in the right color."""
